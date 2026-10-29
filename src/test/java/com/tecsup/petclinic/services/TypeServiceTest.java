@@ -1,10 +1,15 @@
 package com.tecsup.petclinic.services;
 
 import com.tecsup.petclinic.dtos.PetCountByTypeDTO;
+import com.tecsup.petclinic.dtos.TypeDTO;
+import com.tecsup.petclinic.entities.Pet;
+import com.tecsup.petclinic.exceptions.PetNotFoundException;
+import com.tecsup.petclinic.exceptions.TypeNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +21,9 @@ public class TypeServiceTest {
 
     @Autowired
     private TypeService typeService ;
+
+    @Autowired
+    private PetService petService ;
 
     /**
      *
@@ -35,5 +43,33 @@ public class TypeServiceTest {
 
         assertNotNull(hamster);
         assertEquals(COUNT_EXPECTED, hamster.getPetCount());
+    }
+
+    /**
+     *
+     */
+    @Test
+    @Transactional
+    public void testGetPetCountByType_Empty() {
+
+        int SIZE_EXPECTED = 0;
+
+        // ------------ Delete pets and types (rollback at the end) ---------------
+
+        try {
+            for (Pet pet : this.petService.findAll())
+                this.petService.delete(pet.getId());
+
+            for (TypeDTO type : this.typeService.findAll())
+                this.typeService.delete(type.getId());
+        } catch (PetNotFoundException | TypeNotFoundException e) {
+            fail(e.getMessage());
+        }
+
+        // ------------ Validation ---------------
+
+        List<PetCountByTypeDTO> report = this.typeService.getPetCountByType();
+
+        assertEquals(SIZE_EXPECTED, report.size());
     }
 }
