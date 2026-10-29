@@ -72,4 +72,42 @@ public class TypeServiceTest {
 
         assertEquals(SIZE_EXPECTED, report.size());
     }
+
+    /**
+     *
+     */
+    @Test
+    public void testDeleteType() {
+
+        String TYPE_NAME = "ferret";
+        String DESCRIPTION = "Small mustelid";
+
+        // ------------ Create ---------------
+
+        TypeDTO typeDTO = TypeDTO.builder()
+                .name(TYPE_NAME)
+                .description(DESCRIPTION)
+                .active(true)
+                .build();
+
+        TypeDTO newTypeDTO = this.typeService.create(typeDTO);
+        log.info("" + newTypeDTO);
+
+        // ------------ Delete ---------------
+
+        try {
+            this.typeService.delete(newTypeDTO.getId());
+        } catch (TypeNotFoundException e) {
+            fail(e.getMessage());
+        }
+
+        // ------------ Validation ---------------
+
+        try {
+            this.typeService.findById(newTypeDTO.getId());
+            assertTrue(false);
+        } catch (TypeNotFoundException e) {
+            assertTrue(true);
+        }
+    }
 }
