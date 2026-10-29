@@ -1,6 +1,7 @@
 package com.tecsup.petclinic.services;
 
 import com.tecsup.petclinic.dtos.TypeDTO;
+import com.tecsup.petclinic.exceptions.TypeNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,26 @@ public class TypeServiceTest {
 
     @Autowired
     private TypeService typeService;
+
+    /**
+     *
+     */
+    @Test
+    public void testFindTypeById() {
+
+        final String NAME_EXPECTED = "cat";
+
+        Integer ID = 1;
+
+        TypeDTO type = null;
+
+        try {
+            type = this.typeService.findById(ID);
+        } catch (TypeNotFoundException e) {
+            fail(e.getMessage());
+        }
+        assertEquals(NAME_EXPECTED, type.getName());
+    }
 
     /**
      *
