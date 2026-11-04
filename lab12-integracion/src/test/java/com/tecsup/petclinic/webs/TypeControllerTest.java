@@ -1,6 +1,7 @@
 package com.tecsup.petclinic.webs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import com.tecsup.petclinic.dtos.TypeDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasItem;
@@ -73,6 +75,44 @@ public class TypeControllerTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$[*].typeName", hasItem(TYPE_NAME)))
 				.andExpect(jsonPath("$[?(@.typeName == 'cat')].petCount", hasItem(PET_COUNT_EXPECTED)));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeleteType() throws Exception {
+
+		String TYPE_NAME = "chinchilla";
+		String DESCRIPTION = "Small rodent";
+
+		TypeDTO newTypeTO = TypeDTO.builder()
+				.name(TYPE_NAME)
+				.description(DESCRIPTION)
+				.active(true)
+				.build();
+
+		// ------------ Create ---------------
+
+		ResultActions mvcActions = mockMvc.perform(post("/types")
+						.content(om.writeValueAsString(newTypeTO))
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isCreated());
+
+		String response = mvcActions.andReturn().getResponse().getContentAsString();
+
+		Integer id = JsonPath.parse(response).read("$.id");
+
+		// ------------ Delete ---------------
+
+		mockMvc.perform(delete("/types/" + id))
+				.andExpect(status().isOk());
+
+		// ------------ Validation ---------------
+
+		mockMvc.perform(get("/types/" + id))
+				.andExpect(status().isNotFound());
 	}
 
 }
