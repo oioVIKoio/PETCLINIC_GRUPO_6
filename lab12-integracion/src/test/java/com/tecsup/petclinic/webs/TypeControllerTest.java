@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -55,6 +56,23 @@ public class TypeControllerTest {
 				.andExpect(jsonPath("$.name", is(TYPE_NAME)))
 				.andExpect(jsonPath("$.description", is(DESCRIPTION)))
 				.andExpect(jsonPath("$.active", is(ACTIVE)));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetPetCountByType() throws Exception {
+
+		String TYPE_NAME = "cat";
+		int PET_COUNT_EXPECTED = 4;
+
+		mockMvc.perform(get("/types/report/pet-count"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$[*].typeName", hasItem(TYPE_NAME)))
+				.andExpect(jsonPath("$[?(@.typeName == 'cat')].petCount", hasItem(PET_COUNT_EXPECTED)));
 	}
 
 }
