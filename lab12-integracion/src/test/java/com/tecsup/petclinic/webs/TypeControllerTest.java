@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
@@ -66,8 +68,19 @@ public class TypeControllerTest {
 	@Test
 	public void testGetPetCountByType() throws Exception {
 
-		String TYPE_NAME = "cat";
-		int PET_COUNT_EXPECTED = 4;
+		String TYPE_NAME = "cat";      // con los datos semilla: 4 mascotas
+		int TYPE_ID = 1;
+
+		// ------------ Expected: cats registered in /pets ---------------
+
+		String pets = mockMvc.perform(get("/pets"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		List<Integer> catPets = JsonPath.parse(pets).read("$[?(@.typeId == " + TYPE_ID + ")].id");
+		int PET_COUNT_EXPECTED = catPets.size();
+
+		// ------------ Report ---------------
 
 		mockMvc.perform(get("/types/report/pet-count"))
 				.andDo(print())
