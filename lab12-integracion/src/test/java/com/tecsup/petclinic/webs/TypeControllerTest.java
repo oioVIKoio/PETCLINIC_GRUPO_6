@@ -67,4 +67,15 @@ public class TypeControllerTest {
 				.andExpect(jsonPath("$.careLevel", is(CARE_LEVEL)));
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testFindTypeKO() throws Exception {
+
+		mockMvc.perform(get("/types/666"))
+				.andExpect(status().isNotFound());
+
+	}
+
 }
