@@ -41,4 +41,30 @@ public class TypeControllerTest {
 				.andExpect(jsonPath("$[0].name", is(NAME_FIRST_RECORD)));
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testFindTypeOK() throws Exception {
+
+		String TYPE_NAME = "cat";
+		String DESCRIPTION = "Domestic feline";
+		Boolean ACTIVE = true;
+		String SIZE_CATEGORY = "small";
+		int AVERAGE_LIFESPAN = 15;
+		String CARE_LEVEL = "medium";
+
+		this.mockMvc.perform(get("/types/1"))
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.name", is(TYPE_NAME)))
+				.andExpect(jsonPath("$.description", is(DESCRIPTION)))
+				.andExpect(jsonPath("$.active", is(ACTIVE)))
+				.andExpect(jsonPath("$.sizeCategory", is(SIZE_CATEGORY)))
+				.andExpect(jsonPath("$.averageLifespan", is(AVERAGE_LIFESPAN)))
+				.andExpect(jsonPath("$.careLevel", is(CARE_LEVEL)));
+	}
+
 }
