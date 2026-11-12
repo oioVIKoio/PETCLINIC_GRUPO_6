@@ -3,7 +3,9 @@ pipeline {
    tools {
        maven 'Maven'
        jdk 'Java'
-       // git 'Git'
+   }
+   environment {
+       MAVEN_OPTS = "-Xmx512m -XX:MaxMetaspaceSize=256m"
    }
    stages {
        stage('Checkout') {
